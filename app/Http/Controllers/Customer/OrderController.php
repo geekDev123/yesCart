@@ -58,14 +58,7 @@ class OrderController extends Controller
                             $product->update();
                         }
 
-                        /* Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
-                        Stripe\Charge::create ([
-                                "amount" => 100,
-                                "currency" => "usd",
-                                "source" => $request->stripeToken,
-                                "description" => "This payment is initiated by Yescart Customer"
-                        ]); */
-
+                        $this->create_payment($user,$order->amount,$request);
                         return response()->json([
                             'code' => 200,
                             'status' => true,
@@ -132,6 +125,151 @@ class OrderController extends Controller
                     'status' =>  false,
                     'message' => 'Something went wrong'
                 ],404);
+        }
+    }
+
+
+    /**
+     * Create Payment in Stripe
+     */
+
+
+    function create_payment($user, $amount,$data)
+    {
+       
+        try{
+              //$stripe = Stripe::make(env('STRIPE_SECRET'));
+              $stripe = \Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
+                
+              $stripeClient = new \Stripe\StripeClient(
+                env('STRIPE_SECRET')
+              );
+              $get_stripe_token = \Stripe\Token::create([
+                  'card' => [
+                  'number' => '4242424242424242',
+                  'exp_month' => 5,
+                  'exp_year' => 2023,
+                  'cvc' => '453',
+                  ],
+              ]);
+             
+              if(isset($get_stripe_token) && $get_stripe_token['id']){
+
+                $stripe_token   = $get_stripe_token["id"];
+                $today = time();
+                $user           = Auth::user();
+                // Create customer on stripe
+                $customer = \Stripe\Customer::create([
+                    'name' => $user->name,
+                    'address' => [
+                        'line1' => '510 Townsend St',
+                        'postal_code' => '98140',
+                        'city' => 'San Francisco',
+                        'state' => 'CA',
+                        'country' => 'US',
+                    ],
+                    'email' => $user->email,
+                    'source' => $stripe_token
+                ]);
+                
+            
+                if( isset($customer) && isset($customer['id'])){
+                    $customer_id = $customer['id'];
+                    
+                    
+                         
+                  // If user has select recurring mode
+                  if($data['subscription'] == 'yes'){
+                        /* Create Product */
+                        $product = $stripeClient->products->create([
+                            'name' => 'Subscription for '.$data['name'],
+                            ]);
+                            
+                            
+                            /* Create plan */
+                            $price = $stripeClient->prices->create([
+                            'unit_amount' => $amount,
+                            'currency' => 'usd',
+                            'recurring' => ['interval' => 'month'],
+                            'product' => $product['id'],
+                            ]);
+                    /* Create subscription */
+                        $subscription = $stripeClient->subscriptions->create([
+                            'customer' => $customer['id'],
+                            'items' => [
+                                [
+                                    'price' => $price['id']
+                                ],
+                            ],
+                            'metadata' => [
+                                'start_date' => time(),
+                            ],
+                            'payment_behavior' => 'allow_incomplete',
+                            'off_session' => true,
+                    
+                        ]);
+
+
+                        if( $subscription){
+                            return response()->json([
+                                'code' => 200,
+                                'status' => true,
+                                'message' => 'Payment successfully done.'
+                            ], 200);
+                        }
+                        return response()->json([
+                            'code' => 404,
+                            'status' => false,
+                            'message' => 'Some error has been ocurred.'
+                        ], 404);
+                          
+                      }else{
+                        $get_stripe_token = \Stripe\Token::create([
+                            'card' => [
+                            'number' => '4242424242424242',
+                            'exp_month' => 5,
+                            'exp_year' => 2023,
+                            'cvc' => '453',
+                            ],
+                        ]);
+                        $charge = $stripeClient->charges->create([
+                            'amount' => $amount,
+                            'currency' => 'usd',
+                            'source' => $get_stripe_token["id"],
+                            'description' => 'YesCart test Payment',
+                          ]);
+                       
+                          return response()->json([
+                              'code' => 404,
+                              'status' => false,
+                              'message' => 'Customer has not been created.'
+                          ], 404);
+                      }
+                      
+                  }else{
+                    return response()->json([
+                        'code' => 404,
+                        'status' => false,
+                        'message' => 'Customer has not been created.'
+                    ], 404);
+                  }
+                  
+                  
+
+              }else{
+                  return response()->json([
+                      'code' => 404,
+                      'status' => false,
+                      'message' => 'Stripe token has been not generated.'
+                  ], 404);
+              }
+        } catch (\Exception $e) {
+            $message = $e->getMessage();
+            return response()->json([
+                'code' => 404,
+                'status' => false,
+                'message' => $message
+            ], 404);
         }
     }
 }

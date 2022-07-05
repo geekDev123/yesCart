@@ -19,9 +19,9 @@ class CartResource extends JsonResource
             'product_id' => $this->product_id,
             'product_name' => getProductById($this->product_id)->name,
             'butcher_id' => $this->butcher_id,
-            'butcher_name' => getUserMetaInfoById($this->butcher_id,'name') ? getUserMetaInfoById($this->butcher_id,'name')->meta_value:"",
+            'butcher_name' => getUserMetaInfoById($this->butcher_id),
             'customer_id' => $this->customer_id,
-            'customer_name' => getUserMetaInfoById($this->butcher_id,'name') ? getUserMetaInfoById($this->customer_id,'name')->meta_value : "",
+            'customer_name' => getUserMetaInfoById($this->butcher_id),
             'quantity' => $this->quantity,
             'price' => $this->price,
             'product_image' => env('APP_URL').getProductById($this->product_id)->image

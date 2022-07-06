@@ -58,7 +58,7 @@ class OrderController extends Controller
                             $product->update();
                         }
 
-                        $this->create_payment($user,$order->amount,$request);
+                        $this->create_payment($user,$order->amount,$request,$order->id);
                         return response()->json([
                             'code' => 200,
                             'status' => true,
@@ -134,7 +134,7 @@ class OrderController extends Controller
      */
 
 
-    function create_payment($user, $amount,$data)
+    function create_payment($user, $amount,$data,$order_id)
     {
        
         try{
@@ -190,7 +190,7 @@ class OrderController extends Controller
                             $price = $stripeClient->prices->create([
                             'unit_amount' => $amount,
                             'currency' => 'usd',
-                            'recurring' => ['interval' => 'month'],
+                            'recurring' => ['interval' => 'day'],
                             'product' => $product['id'],
                             ]);
                     /* Create subscription */
@@ -211,6 +211,15 @@ class OrderController extends Controller
 
 
                         if( $subscription){
+
+                            $order = Order::where('customer_id',$user->id)->where('id',$order_id)->first();
+                            
+                            $order->stripe_customer_id = $customer['id'];
+                            $order->subscription_id = $subscription['id'];
+                            $order->charges_amount = $amount;
+                            $order->plan_price = $price['id'];
+                            $order->save();
+
                             return response()->json([
                                 'code' => 200,
                                 'status' => true,
@@ -232,13 +241,23 @@ class OrderController extends Controller
                             'cvc' => '453',
                             ],
                         ]);
-                        $charge = $stripeClient->charges->create([
-                            'amount' => $amount,
-                            'currency' => 'usd',
-                            'source' => $get_stripe_token["id"],
-                            'description' => 'YesCart test Payment',
+                        
+                        $session = \Stripe\Checkout\Session::create([
+                            'line_items' => [[
+                              'price_data' => [
+                                'currency' => 'usd',
+                                'product_data' => [
+                                  'name' => $data['name'],
+                                ],
+                                'unit_amount' => $amount,
+                              ],
+                              'quantity' => 1,
+                            ]],
+                            'mode' => 'payment',
+                            'success_url' => 'http://192.168.1.89:8000/api/payment_success',
+                            'cancel_url' => 'http://192.168.1.89:8000/api/cancel_payment',
                           ]);
-                       
+
                           return response()->json([
                               'code' => 404,
                               'status' => false,
@@ -271,5 +290,23 @@ class OrderController extends Controller
                 'message' => $message
             ], 404);
         }
+    }
+
+    public function payment_success()
+    {
+        return response()->json([
+            'code' => 200,
+            'status' => true,
+            'message' => 'Payment successfully done.'
+        ], 200);
+    }
+
+    public function cancel_payment()
+    {
+        return response()->json([
+            'code' => 200,
+            'status' => true,
+            'message' => 'Payment has been cancelled!'
+        ], 200);
     }
 }

@@ -43,7 +43,11 @@ class Order extends Model
 		'amount',
 		'product_id',
 		'customer_id',
-		'transaction_id'
+		'transaction_id',
+		'stripe_customer_id',
+		'subscription_id',
+		'charges_amount',
+		'plan_price'
 	];
 
 	public function user()

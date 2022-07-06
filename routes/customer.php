@@ -20,6 +20,7 @@ Route::group([
         Route::group(['prefix' => 'orders','as' => 'orders.'], function ($router) {
             Route::post('/store', [OrderController::class, 'store'])->name('store');
             Route::get('/list', [OrderController::class, 'list'])->name('list');
+            Route::get('/payment_success', [OrderController::class, 'payment_success'])->name('payment_success');
         });
 
         Route::group(['prefix' => 'payment', 'as' => 'payment.'], function($router){

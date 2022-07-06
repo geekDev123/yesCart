@@ -76,10 +76,12 @@ class AuthController extends Controller
         $user->save();
 
         if( intval($user->id) > 0 ){
+            $token = auth()->login($user);            
             return response()->json([
                 'code' => 200,
                 'status' => true,
                 'message' => 'User registered successfully',
+                'access_token' => $token,
                 'data' => new UserResource($user)
             ], 200);
         } 

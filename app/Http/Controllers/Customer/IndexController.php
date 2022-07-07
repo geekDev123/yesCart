@@ -151,14 +151,20 @@ class IndexController extends Controller
             
                 $lat = $user['lat'];
                 $long = $user['long'];
-
-                $butcher = User::select("*",DB::raw("6371 * acos(cos(radians(" . $lat . ")) 
+                if($lat && $long){
+                    $butcher = User::select("*",DB::raw("6371 * acos(cos(radians(" . $lat . ")) 
                     * cos(radians(users.lat)) 
                     * cos(radians(users.long) - radians(" . $long . ")) 
                     + sin(radians(" .$lat. ")) 
                     * sin(radians(users.lat))) AS distance"))->where('id',$request->id)
                     ->with('products')
                     ->first();
+                }else{
+                    $butcher = User::where('id',$request->id)
+                    ->with('products')
+                    ->first();
+                }
+                
                 $data = $butcher;
               
                 if($data){

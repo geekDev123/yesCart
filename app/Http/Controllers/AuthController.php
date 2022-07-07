@@ -82,6 +82,7 @@ class AuthController extends Controller
                 [
                   'country' => 'US',
                   'type' => 'express',
+                  'email' => $request->email,
                   'capabilities' => [
                     'card_payments' => ['requested' => true],
                     'transfers' => ['requested' => true],

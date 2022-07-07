@@ -29,10 +29,10 @@ class IndexController extends Controller
               
                 if($request->limit && intval($request->limit) > 0){  
 
-                    $data = User::select("*",DB::raw("6371 * acos(cos(radians($lat)) 
+                    $data = User::select("*",DB::raw("6371 * acos(cos(radians(".$lat.")) 
                                     * cos(radians(users.lat)) 
-                                    * cos(radians(users.long) - radians($long)) 
-                                    + sin(radians($lat)) 
+                                    * cos(radians(users.long) - radians(".$long.")) 
+                                    + sin(radians(".$lat.")) 
                                     * sin(radians(users.lat))) AS distance"))
                                 ->having('distance', '<', 1000)
                                 ->where('type','butcher')
@@ -41,10 +41,10 @@ class IndexController extends Controller
                      
                 }else{
 
-                    $data = User::select("*",DB::raw("6371 * acos(cos(radians($lat)) 
+                    $data = User::select("*",DB::raw("6371 * acos(cos(radians(".$lat.")) 
                                     * cos(radians(users.lat)) 
-                                    * cos(radians(users.long) - radians($long)) 
-                                    + sin(radians($lat)) 
+                                    * cos(radians(users.long) - radians(".$long.")) 
+                                    + sin(radians(".$lat.")) 
                                     * sin(radians(users.lat))) AS distance"))
                                 ->having('distance', '<', 1000)
                                 ->where('type','butcher')

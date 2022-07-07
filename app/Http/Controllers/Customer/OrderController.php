@@ -138,8 +138,7 @@ class OrderController extends Controller
               $stripeClient = new \Stripe\StripeClient(
                 env('STRIPE_SECRET')
               );
-
-              
+            
               $get_stripe_token = \Stripe\Token::create([
                   'card' => [
                   'number' => '4242424242424242',
@@ -167,11 +166,11 @@ class OrderController extends Controller
                     ],
                     'email' => $user->email,
                     'source' => $stripe_token
-                   
                 ]);
 
             
                 if( isset($customer) && isset($customer['id'])){
+                    
                   // If user has select recurring mode
                   if($data['subscription'] == 'yes'){
 
@@ -187,7 +186,7 @@ class OrderController extends Controller
                         'recurring' => ['interval' => 'day'],
                         'product' => $product['id'],
                         ]);
-
+                        
                         /* Create subscription */
                         $subscription = $stripeClient->subscriptions->create([
                             'customer' => $customer['id'],
@@ -199,9 +198,11 @@ class OrderController extends Controller
                             'metadata' => [
                                 'start_date' => time(),
                             ],
-                            'payment_behavior' => 'allow_incomplete',
-                            'off_session' => true
+                            'payment_behavior' => 'default_incomplete',
+                            //'application_fee_percent' => 10,
+                            //'transfer_data' => ['destination' => 'acct_1LIWoKEUtFIxo3CQ'],
                         ]);
+                       
                         
                         if( $subscription){
                             $order = Order::where('customer_id',$user->id)->where('id',$order_id)->first();
@@ -254,8 +255,14 @@ class OrderController extends Controller
                             'mode' => 'payment',
                             'success_url' => 'http://192.168.1.89:8000/api/payment_success',
                             'cancel_url' => 'http://192.168.1.89:8000/api/cancel_payment',
+                            'payment_intent_data' => [
+                                'application_fee_amount' => 12,
+                                'transfer_data' => [
+                                  'destination' => 'acct_1LIWoKEUtFIxo3CQ',
+                                ],
+                              ],
                           ]);
-
+                          
                           return response()->json([
                               'code' => 200,
                               'status' => false,

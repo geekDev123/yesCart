@@ -18,6 +18,7 @@ class AddStripeColoumnsToOrders extends Migration
             $table->string('subscription_id')->nullable();
             $table->string('charges_amount')->nullable();
             $table->string('plan_price')->nullable();
+            $table->string('subscription')->nullable();
         });
     }
 
@@ -29,7 +30,7 @@ class AddStripeColoumnsToOrders extends Migration
     public function down()
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->dropColumn(['stripe_customer_id','subscription_id', 'charges_amount','plan_price']);
+            $table->dropColumn(['stripe_customer_id','subscription_id', 'charges_amount','plan_price','subscription']);
         });
     }
 }

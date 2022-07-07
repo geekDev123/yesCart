@@ -21,6 +21,11 @@ class OrderResource extends JsonResource
             'status' => $this->status,
             'amount' => $this->amount,
             'vendor' => getVendorInfoByProductId($this->product_id),
+            'stripe_customer_id' => $this->stripe_customer_id,
+            'subscription_id' => $this->subscription_id,
+            'charges_amount' => $this->charges_amount,
+            'plan_price' => $this->plan_price,
+            'subscription' => $this->subscription,
             'created_at' => $this->created_at->format('Y-m-d H:i:s')
         ];
     }

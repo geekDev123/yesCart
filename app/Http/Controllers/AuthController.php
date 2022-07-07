@@ -9,7 +9,7 @@ use App\Http\Resources\UserResource;
 use Illuminate\Support\Facades\Auth;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
-
+use Stripe;
 class AuthController extends Controller
 {
     public $token = true; 
@@ -74,7 +74,24 @@ class AuthController extends Controller
         $user->description = $request->description;
         $user->image = $imageUrl;
         $user->save();
-
+        if($user->type == 'butcher'){
+            $stripeClient = new \Stripe\StripeClient(
+                env('STRIPE_SECRET')
+              );
+            $merchant_account = $stripeClient->accounts->create(
+                [
+                  'country' => 'US',
+                  'type' => 'express',
+                  'capabilities' => [
+                    'card_payments' => ['requested' => true],
+                    'transfers' => ['requested' => true],
+                  ],
+                  'business_type' => 'individual',
+                  'business_profile' => ['url' => 'https://geekinformatics.com/yesCart'],
+                ]
+              );
+          
+        }
         if( intval($user->id) > 0 ){
             $token = auth()->login($user);            
             return response()->json([

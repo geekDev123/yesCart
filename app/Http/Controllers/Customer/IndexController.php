@@ -136,7 +136,7 @@ class IndexController extends Controller
      
     }
 
-    public function get_butcher_by_id(Request $request,$id)
+    public function get_butcher_by_id(Request $request)
     {
        
         try { 
@@ -152,7 +152,7 @@ class IndexController extends Controller
                     * cos(radians(users.lat)) 
                     * cos(radians(users.long) - radians(" . $long . ")) 
                     + sin(radians(" .$lat. ")) 
-                    * sin(radians(users.lat))) AS distance"))->where('id',$id)
+                    * sin(radians(users.lat))) AS distance"))->where('id',$request->id)
                     ->with('products')
                     ->first();
                 $data = $butcher;

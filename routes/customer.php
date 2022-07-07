@@ -14,13 +14,15 @@ Route::group([
 ], function ($router) {
         Route::group(['prefix' => 'butchers','as' => 'butchers.'], function ($router) {
             Route::get('/nearBy', [IndexController::class, 'get_nearby_butchers']);
-            Route::get('/get_butcher/{id}', [IndexController::class, 'get_butcher_by_id']);
+            Route::get('/get_butcher', [IndexController::class, 'get_butcher_by_id']);
         });
 
         Route::group(['prefix' => 'orders','as' => 'orders.'], function ($router) {
             Route::post('/store', [OrderController::class, 'store'])->name('store');
             Route::get('/list', [OrderController::class, 'list'])->name('list');
             Route::get('/payment_success', [OrderController::class, 'payment_success'])->name('payment_success');
+            Route::get('/cancel_payment', [OrderController::class, 'cancel_payment'])->name('cancel_payment');
+            Route::post('/cancel_subscription/{id}', [OrderController::class, 'cancel_subscription'])->name('cancel_subscription');
         });
 
         Route::group(['prefix' => 'payment', 'as' => 'payment.'], function($router){

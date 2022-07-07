@@ -47,7 +47,8 @@ class Order extends Model
 		'stripe_customer_id',
 		'subscription_id',
 		'charges_amount',
-		'plan_price'
+		'plan_price',
+		'subscription'
 	];
 
 	public function user()

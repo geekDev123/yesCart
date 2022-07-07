@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth; 
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\User;
 use Stripe;
 use App\Http\Resources\OrderResource;
 use Illuminate\Support\Facades\Validator;
@@ -57,8 +58,10 @@ class OrderController extends Controller
                             $product->status = 'outofstock';
                             $product->update();
                         }
-
-                        return $this->create_payment($user,$order->amount,$request,$order->id);
+                        $butcher_id = Product::where('id',$request->product_id)->first();
+                        $get_merchant_id = user::where('id',$butcher_id->butcher_id)->first();
+                      
+                        return $this->create_payment($user,$order->amount,$request,$order->id,$get_merchant_id['merchant_id']);
                     }
                 }
                 return response()->json([
@@ -127,10 +130,8 @@ class OrderController extends Controller
      * Create Payment in Stripe
      */
 
-
-    function create_payment($user, $amount,$data,$order_id)
+    function create_payment($user, $amount,$data,$order_id,$merchant_id)
     {
-       
         try{
               //$stripe = Stripe::make(env('STRIPE_SECRET'));
               $stripe = \Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
@@ -199,12 +200,17 @@ class OrderController extends Controller
                                 'start_date' => time(),
                             ],
                             'payment_behavior' => 'default_incomplete',
-                            //'application_fee_percent' => 10,
-                            //'transfer_data' => ['destination' => 'acct_1LIWoKEUtFIxo3CQ'],
                         ]);
                        
                         
                         if( $subscription){
+
+                            $transfer = \Stripe\Transfer::create([
+                                'amount' => $amount,
+                                'currency' => 'inr',
+                                'destination' => $merchant_id
+                            ]);
+
                             $order = Order::where('customer_id',$user->id)->where('id',$order_id)->first();
                             $order->stripe_customer_id = $customer['id'];
                             $order->subscription_id = $subscription['id'];
@@ -258,11 +264,15 @@ class OrderController extends Controller
                             'payment_intent_data' => [
                                 'application_fee_amount' => 12,
                                 'transfer_data' => [
-                                  'destination' => 'acct_1LIWoKEUtFIxo3CQ',
+                                  'destination' => $merchant_id,
                                 ],
                               ],
                           ]);
-                          
+                          $transfer = \Stripe\Transfer::create([
+                            'amount' => $amount,
+                            'currency' => 'inr',
+                            'destination' => $merchant_id
+                        ]);
                           return response()->json([
                               'code' => 200,
                               'status' => false,

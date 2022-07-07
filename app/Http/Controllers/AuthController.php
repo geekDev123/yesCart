@@ -58,6 +58,23 @@ class AuthController extends Controller
                 $imageUrl = '/images/'.$request->type.'/'.time().'.'.$getImage->extension();
                 $getImage->move($imagePath, $imageName);
             }
+
+
+            $stripeClient = new \Stripe\StripeClient(
+                env('STRIPE_SECRET')
+              );
+            $merchant_account = $stripeClient->accounts->create(
+                [
+                  'country' => 'US',
+                  'type' => 'express',
+                  'capabilities' => [
+                    'card_payments' => ['requested' => true],
+                    'transfers' => ['requested' => true],
+                  ],
+                  'business_type' => 'individual',
+                  'business_profile' => ['url' => 'https://geekinformatics.com/yesCart'],
+                ]
+              );
         }else{
             $imageUrl = '';
         }
@@ -73,26 +90,9 @@ class AuthController extends Controller
         $user->address = $request->address;
         $user->description = $request->description;
         $user->image = $imageUrl;
+        $user->merchant_id = $merchant_account['id'];
         $user->save();
-        if($user->type == 'butcher'){
-            $stripeClient = new \Stripe\StripeClient(
-                env('STRIPE_SECRET')
-              );
-            $merchant_account = $stripeClient->accounts->create(
-                [
-                  'country' => 'US',
-                  'type' => 'express',
-                  'email' => $request->email,
-                  'capabilities' => [
-                    'card_payments' => ['requested' => true],
-                    'transfers' => ['requested' => true],
-                  ],
-                  'business_type' => 'individual',
-                  'business_profile' => ['url' => 'https://geekinformatics.com/yesCart'],
-                ]
-              );
-          
-        }
+        
         if( intval($user->id) > 0 ){
             $token = auth()->login($user);            
             return response()->json([

@@ -20,6 +20,7 @@ class AddInfoColumnsToUsers extends Migration
             $table->string('address')->nullable();
             $table->string('description')->nullable();
             $table->string('image')->nullable();
+            $table->string('merchant_id')->nullable();
         });
     }
 
@@ -31,7 +32,7 @@ class AddInfoColumnsToUsers extends Migration
     public function down()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn(['phone_number','lat', 'long','address','description','image']);
+            $table->dropColumn(['phone_number','lat', 'long','address','description','image','merchant_id']);
         });
     }
 }

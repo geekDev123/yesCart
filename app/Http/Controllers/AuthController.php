@@ -90,7 +90,7 @@ class AuthController extends Controller
         $user->address = $request->address;
         $user->description = $request->description;
         $user->image = $imageUrl;
-        $user->merchant_id = $merchant_account['id'];
+        $user->merchant_id = isset($merchant_account['id']) ? $merchant_account['id']:"";
         $user->save();
         
         if( intval($user->id) > 0 ){

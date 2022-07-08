@@ -207,7 +207,7 @@ class OrderController extends Controller
 
                             $transfer = \Stripe\Transfer::create([
                                 'amount' => $amount,
-                                'currency' => 'inr',
+                                'currency' => 'usd',
                                 'destination' => $merchant_id
                             ]);
 
@@ -270,7 +270,7 @@ class OrderController extends Controller
                           ]);
                           $transfer = \Stripe\Transfer::create([
                             'amount' => $amount,
-                            'currency' => 'inr',
+                            'currency' => 'usd',
                             'destination' => $merchant_id
                         ]);
                           return response()->json([

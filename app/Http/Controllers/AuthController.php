@@ -66,11 +66,11 @@ class AuthController extends Controller
             $merchant_account = $stripeClient->accounts->create(
                 [
                   'country' => 'US',
-                  'type' => 'express',
-                  'capabilities' => [
+                  'type' => 'standard',
+                  /* 'capabilities' => [
                     'card_payments' => ['requested' => true],
                     'transfers' => ['requested' => true],
-                  ],
+                  ], */
                   'business_type' => 'individual',
                   'business_profile' => ['url' => 'https://geekinformatics.com/yesCart'],
                 ]

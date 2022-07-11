@@ -149,12 +149,12 @@ class OrderController extends Controller
                   ],
               ]);
              
-              if(isset($get_stripe_token) && $get_stripe_token['id']){
+            if(isset($get_stripe_token) && $get_stripe_token['id']){
 
                 $stripe_token   = $get_stripe_token["id"];
                 $today = time();
                 $user           = Auth::user();
-
+               
                 // Create customer on stripe
                 $customer = \Stripe\Customer::create([
                     'name' => $user->name,
@@ -169,11 +169,10 @@ class OrderController extends Controller
                     'source' => $stripe_token
                 ]);
 
-            
                 if( isset($customer) && isset($customer['id'])){
                     
-                  // If user has select recurring mode
-                  if($data['subscription'] == 'yes'){
+                    // If user has select recurring mode
+                    if($data['subscription'] == 'yes'){
 
                         /* Create Product */
                         $product = $stripeClient->products->create([
@@ -199,18 +198,14 @@ class OrderController extends Controller
                             'metadata' => [
                                 'start_date' => time(),
                             ],
-                            'payment_behavior' => 'default_incomplete',
+                            'payment_behavior' => 'allow_incomplete',
+                            'expand' => ['latest_invoice.payment_intent'],
+                            'application_fee_percent' => ($amount) * 10/100,
+                            'transfer_data' => ['destination' => $merchant_id],
                         ]);
+
                        
-                        
                         if( $subscription){
-
-                            $transfer = \Stripe\Transfer::create([
-                                'amount' => $amount,
-                                'currency' => 'usd',
-                                'destination' => $merchant_id
-                            ]);
-
                             $order = Order::where('customer_id',$user->id)->where('id',$order_id)->first();
                             $order->stripe_customer_id = $customer['id'];
                             $order->subscription_id = $subscription['id'];
@@ -232,21 +227,19 @@ class OrderController extends Controller
                             'message' => 'Some error has been ocurred.'
                         ], 404);
                           
-                      }else{
-
+                    }else{
                         $order = Order::where('customer_id',$user->id)->where('id',$order_id)->first();
                         $order->stripe_customer_id = $customer['id'];
                         $order->charges_amount = $amount;
                         $order->save();
                         $get_stripe_token = \Stripe\Token::create([
                             'card' => [
-                            'number' => '4242424242424242',
+                            'number' => '4000 0000 0000 0077',
                             'exp_month' => 5,
                             'exp_year' => 2023,
                             'cvc' => '453',
                             ],
                         ]);
-                        
                         $session = \Stripe\Checkout\Session::create([
                             'line_items' => [[
                               'price_data' => [
@@ -262,41 +255,35 @@ class OrderController extends Controller
                             'success_url' => 'http://192.168.1.89:8000/api/payment_success',
                             'cancel_url' => 'http://192.168.1.89:8000/api/cancel_payment',
                             'payment_intent_data' => [
-                                'application_fee_amount' => 12,
+                                'application_fee_percent' => ($amount) * 10/100,
                                 'transfer_data' => [
                                   'destination' => $merchant_id,
                                 ],
                               ],
                           ]);
-                          $transfer = \Stripe\Transfer::create([
-                            'amount' => $amount,
-                            'currency' => 'usd',
-                            'destination' => $merchant_id
-                        ]);
                           return response()->json([
                               'code' => 200,
                               'status' => false,
                               'message' => 'Order created successfully.',
                               'data' => new OrderResource($order)
                           ], 200);
-                      }
-                      
-                  }else{
+                    }
+                }else{
                     return response()->json([
                         'code' => 404,
                         'status' => false,
                         'message' => 'Customer has not been created.'
                     ], 404);
-                  }
+                }
                   
 
-              }else{
+            }else{
                   return response()->json([
                       'code' => 404,
                       'status' => false,
                       'message' => 'Stripe token has been not generated.'
                   ], 404);
-              }
+            }
         } catch (\Exception $e) {
             $message = $e->getMessage();
             return response()->json([

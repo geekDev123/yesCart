@@ -9,6 +9,7 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
 use Stripe;
+
 use App\Http\Resources\OrderResource;
 use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Exceptions\JWTException;
@@ -322,8 +323,8 @@ class OrderController extends Controller
      * Cancel Subscription
      */
 
-     public function cancel_subscription($id)
-     {
+    public function cancel_subscription($id)
+    {
         try{
              \Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
               $cancel_subscription = \Stripe\Subscription::retrieve($id);
@@ -354,5 +355,49 @@ class OrderController extends Controller
                 'message' => $message
             ], 404);
         }
-     }
+    }
+
+    /**
+     * Get Customer Subscription List
+     */
+    public function get_subscriptions()
+    {
+        try{
+            $user  = Auth::user();
+          
+            $stripeClient = new \Stripe\StripeClient(
+                env('STRIPE_SECRET')
+              );
+
+            $customer = $stripeClient->customers->search(['query' => 'email:\''.Auth::user()->email.'\'']);
+            
+           /*  $subscriptions = $stripeClient->subscriptions->all('"'.$customer['data'][0]['id'].'"');
+            echo"<pre>";
+            print_r($subscriptions);
+            die();
+            foreach ($subscriptions['data'] as $subscription) {
+                var_dump($subscription['id']);
+            } */
+            
+            if($customer){
+                return response()->json([
+                    'code' => 200,
+                    'status' => true,
+                    'data' => $customer
+                ], 200);
+            }
+            return response()->json([
+                'code' => 200,
+                'status' => true,
+                'message' => 'No Subscription found!'
+            ], 200);
+        }catch (\Exception $e) {
+            $message = $e->getMessage();
+            return response()->json([
+                'code' => 404,
+                'status' => false,
+                'message' => $message
+            ], 404);
+        }
+    }
 }

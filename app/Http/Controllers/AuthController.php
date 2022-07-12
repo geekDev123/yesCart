@@ -137,7 +137,7 @@ class AuthController extends Controller
             return response()->json([
                 'code' => 404,
                 'status' => false,
-                'message' => 'Unauthorized'
+                'message' => 'You have entered an invalid username or password.'
             ], 401);
         }
        

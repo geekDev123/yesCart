@@ -256,8 +256,8 @@ class OrderController extends Controller
                               'quantity' => 1,
                             ]],
                             'mode' => 'payment',
-                            'success_url' => 'http://192.168.1.89:8000/api/payment_success',
-                            'cancel_url' => 'http://192.168.1.89:8000/api/cancel_payment',
+                            'success_url' => env('APP_URL').'/api/payment_success',
+                            'cancel_url' => env('APP_URL').'/api/cancel_payment',
                             'payment_intent_data' => [
                                 'application_fee_percent' => ($amount) * 10/100,
                                 'transfer_data' => [

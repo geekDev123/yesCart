@@ -72,7 +72,7 @@ class AuthController extends Controller
                     'transfers' => ['requested' => true],
                   ], */
                   'business_type' => 'individual',
-                  'business_profile' => ['url' => 'https://geekinformatics.com/yesCart'],
+                  'business_profile' => ['url' => env('LIVE_URL').'/yesCart'],
                 ]
               );
         }else{
@@ -137,7 +137,7 @@ class AuthController extends Controller
             return response()->json([
                 'code' => 404,
                 'status' => false,
-                'message' => 'You have entered an invalid username or password.'
+                'message' => 'Invalid email or password.'
             ], 401);
         }
        

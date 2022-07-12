@@ -23,7 +23,6 @@ Route::group([
             Route::get('/payment_success', [OrderController::class, 'payment_success'])->name('payment_success');
             Route::get('/cancel_payment', [OrderController::class, 'cancel_payment'])->name('cancel_payment');
             Route::post('/cancel_subscription/{id}', [OrderController::class, 'cancel_subscription'])->name('cancel_subscription');
-            Route::get('/subscriptions', [OrderController::class, 'get_subscriptions'])->name('subscriptions');
         });
 
         Route::group(['prefix' => 'payment', 'as' => 'payment.'], function($router){

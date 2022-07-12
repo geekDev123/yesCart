@@ -140,7 +140,7 @@ class OrderController extends Controller
               $stripeClient = new \Stripe\StripeClient(
                 env('STRIPE_SECRET')
               );
-            
+             //Stripe token will be given by mobile team
               $get_stripe_token = \Stripe\Token::create([
                   'card' => [
                   'number' => '4242424242424242',
@@ -182,10 +182,10 @@ class OrderController extends Controller
                             
                         /* Create plan */
                         $price = $stripeClient->prices->create([
-                        'unit_amount' => $amount,
-                        'currency' => 'usd',
-                        'recurring' => ['interval' => 'day'],
-                        'product' => $product['id'],
+                            'unit_amount' => $amount,
+                            'currency' => 'usd',
+                            'recurring' => ['interval' => 'day'],
+                            'product' => $product['id'],
                         ]);
                         
                         /* Create subscription */
@@ -207,6 +207,7 @@ class OrderController extends Controller
 
                        
                         if( $subscription){
+
                             $order = Order::where('customer_id',$user->id)->where('id',$order_id)->first();
                             $order->stripe_customer_id = $customer['id'];
                             $order->subscription_id = $subscription['id'];
@@ -233,6 +234,8 @@ class OrderController extends Controller
                         $order->stripe_customer_id = $customer['id'];
                         $order->charges_amount = $amount;
                         $order->save();
+
+                         //Stripe token will be given by mobile team
                         $get_stripe_token = \Stripe\Token::create([
                             'card' => [
                             'number' => '4000 0000 0000 0077',
@@ -327,66 +330,28 @@ class OrderController extends Controller
     {
         try{
              \Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
-              $cancel_subscription = \Stripe\Subscription::retrieve($id);
-             
-              $cancel_subscription->cancel();
-              $order = Order::where('subscription_id',$id)->first(); 
-              $order->subscription = 'cancelled';
-              $order->save();
-             
-              if($cancel_subscription && intval($order->id)){
+              $subscription = \Stripe\Subscription::retrieve($id);
+              if($subscription){
+                
+                $subscription->cancel();
+                $order = Order::where('subscription_id',$id)->first(); 
+                $order->subscription = 'cancelled';
+                $order->save();
+
+                if(intval($order->id)){
+                    return response()->json([
+                        'code' => 200,
+                        'status' => true,
+                        'message' => 'Subscription Cancelled Successfully!'
+                    ], 200);
+                }
                 return response()->json([
                     'code' => 200,
                     'status' => true,
-                    'message' => 'Subscription Cancelled Successfully!'
+                    'message' => 'Something went wrong!'
                 ], 200);
               }
               return response()->json([
-                'code' => 200,
-                'status' => true,
-                'message' => 'Something went wrong!'
-            ], 200);
-              
-        }catch (\Exception $e) {
-            $message = $e->getMessage();
-            return response()->json([
-                'code' => 404,
-                'status' => false,
-                'message' => $message
-            ], 404);
-        }
-    }
-
-    /**
-     * Get Customer Subscription List
-     */
-    public function get_subscriptions()
-    {
-        try{
-            $user  = Auth::user();
-          
-            $stripeClient = new \Stripe\StripeClient(
-                env('STRIPE_SECRET')
-              );
-
-            $customer = $stripeClient->customers->search(['query' => 'email:\''.Auth::user()->email.'\'']);
-            
-           /*  $subscriptions = $stripeClient->subscriptions->all('"'.$customer['data'][0]['id'].'"');
-            echo"<pre>";
-            print_r($subscriptions);
-            die();
-            foreach ($subscriptions['data'] as $subscription) {
-                var_dump($subscription['id']);
-            } */
-            
-            if($customer){
-                return response()->json([
-                    'code' => 200,
-                    'status' => true,
-                    'data' => $customer
-                ], 200);
-            }
-            return response()->json([
                 'code' => 200,
                 'status' => true,
                 'message' => 'No Subscription found!'
@@ -400,4 +365,5 @@ class OrderController extends Controller
             ], 404);
         }
     }
+
 }

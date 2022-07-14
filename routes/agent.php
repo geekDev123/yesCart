@@ -19,6 +19,10 @@ Route::group([
             Route::post('/update', [PackageController::class, 'update'])->name('update');
             Route::post('/delete', [PackageController::class, 'delete'])->name('delete');
         });
+
+        Route::group(['prefix' => 'products', 'as' => 'products.'], function($router){
+            Route::get('/search', [IndexController::class, 'search'])->name('search');
+        });
 });
 
 ?>

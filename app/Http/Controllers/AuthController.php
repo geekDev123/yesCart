@@ -72,7 +72,7 @@ class AuthController extends Controller
                     'transfers' => ['requested' => true],
                   ], */
                   'business_type' => 'individual',
-                  'business_profile' => ['url' => env('LIVE_URL').'/yesCart'],
+                  'business_profile' => ['url' => 'https://geekinformatics.com/yesCart'],
                 ]
               );
         }else{

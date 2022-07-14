@@ -45,7 +45,6 @@ class IndexController extends Controller
                                 * sin(radians(users.lat))) AS distance"))
                             ->having('distance', '<', 1000)
                             ->where('type','butcher')
-                            ->limit($request->limit)
                             ->get(); 
                 } 
                 
@@ -83,22 +82,26 @@ class IndexController extends Controller
             if (!$user = auth()->user()) {
                 return response()->json(['code' => 404, 'status' => false, 'message' => 'Unathorised']);
             } else {
+                $user = Auth::User();
+              
+                $lat = $user['lat'];
+                $long = $user['long'];
 
+                $butcher_ids = User::select("*",DB::raw("6371 * acos(cos(radians(" . $lat . ")) 
+                                * cos(radians(users.lat)) 
+                                * cos(radians(users.long) - radians(" . $long . ")) 
+                                + sin(radians(" .$lat. ")) 
+                                * sin(radians(users.lat))) AS distance"))
+                            ->having('distance', '<', 1000)
+                            ->where('type','butcher')
+                            ->pluck('id')
+                            ->toArray(); 
                 if(!empty($request->keyword)){
-                    $get_users = User::select("*", DB::raw("'vendor' as type"))->where('type','butcher')->where('name','like','%'.$request->keyword.'%')->get();
-                    $get_products = Product::select("*", DB::raw("'product' as type"))->where('name','like','%'.$request->keyword.'%')->get();
+                    $get_products = Product::select("*", DB::raw("'product' as type"))->where('name','like','%'.$request->keyword.'%')->whereIn( 'butcher_id', $butcher_ids)->get();
                 }else{
-                    $get_users = User::select("*", DB::raw("'vendor' as type"))->where('type','butcher')->get();
-                    $get_products = Product::select("*", DB::raw("'product' as type"))->get();
-                   
+                    $get_products = Product::select("*", DB::raw("'product' as type"))->whereIn( 'butcher_id', $butcher_ids)->get();
                 }
-                
-                if(!empty($request->keyword)){
-                    $users = collect($get_users);
-                    $products = collect($get_products);
-                    $data = $users->merge($products);
-                }
-                
+            
                 $data = collect($get_products);
                 
                 if($data){

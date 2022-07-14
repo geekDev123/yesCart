@@ -94,22 +94,39 @@ class IndexController extends Controller
             if (!$user = auth()->user()) {
                 return response()->json(['code' => 404, 'status' => false, 'message' => 'Unathorised']);
             } else {
-
-                $validator = Validator::make($request->all(), [
-                    'keyword' => 'required',
-                ]);
-                if($validator->fails()){ 
-                    return response()->json([
-                        'code' => 404,
-                        'status' => false,
-                        'message' => $validator->errors(),
-                    ], 404);
+                $user = Auth::User();
+                $lat = $user['lat'];
+                $long = $user['long'];
+            
+                $butcher_ids = User::select("*",DB::raw("6371 * acos(cos(radians(" . $lat . ")) 
+                            * cos(radians(users.lat)) 
+                            * cos(radians(users.long) - radians(" . $long . ")) 
+                            + sin(radians(" .$lat. ")) 
+                            * sin(radians(users.lat))) AS distance"))
+                        ->having('distance', '<', 1000)
+                        ->where('type','butcher')
+                        ->pluck('id')
+                        ->toArray(); 
+               
+                $agent_ids = User::select("*",DB::raw("6371 * acos(cos(radians(" . $lat . ")) 
+                            * cos(radians(users.lat)) 
+                            * cos(radians(users.long) - radians(" . $long . ")) 
+                            + sin(radians(" .$lat. ")) 
+                            * sin(radians(users.lat))) AS distance"))
+                        ->having('distance', '<', 1000)
+                        ->where('type','agent')
+                        ->pluck('id')
+                        ->toArray(); 
+                if(isset($request->keyword) && !empty($request->keyword)){
+                    $get_users = User::select("*", DB::raw("'vendor' as type"))->where('name','like','%'.$request->keyword.'%')->whereIn( 'id', $butcher_ids)->get();
+                    $get_products = Product::select("*", DB::raw("'product' as type"))->where('name','like','%'.$request->keyword.'%')->whereIn( 'butcher_id', $butcher_ids)->get();
+                    $get_packages = Package::select("*", DB::raw("'package' as type"))->where('name','like','%'.$request->keyword.'%')->whereIn( 'agent_id', $agent_ids)->get();
+                }else{
+                    $get_users = User::select("*", DB::raw("'vendor' as type"))->whereIn( 'id', $butcher_ids)->get();
+                    $get_products = Product::select("*", DB::raw("'product' as type"))->whereIn( 'butcher_id', $butcher_ids)->get();
+                    $get_packages = Package::select("*", DB::raw("'package' as type"))->whereIn( 'agent_id', $agent_ids)->get();
+                  
                 }
-                
-                $get_users = User::select("*", DB::raw("'vendor' as type"))->where('name','like','%'.$request->keyword.'%')->get();
-                $get_products = Product::select("*", DB::raw("'product' as type"))->where('name','like','%'.$request->keyword.'%')->get();
-                $get_packages = Package::select("*", DB::raw("'package' as type"))->where('name','like','%'.$request->keyword.'%')->get();
-              
                 $users = collect($get_users);
                 $products = collect($get_products);
                 $merged = $users->merge($products);

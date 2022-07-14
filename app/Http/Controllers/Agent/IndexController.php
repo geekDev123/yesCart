@@ -84,23 +84,22 @@ class IndexController extends Controller
                 return response()->json(['code' => 404, 'status' => false, 'message' => 'Unathorised']);
             } else {
 
-                $validator = Validator::make($request->all(), [
-                    'keyword' => 'required',
-                ]);
-                if($validator->fails()){ 
-                    return response()->json([
-                        'code' => 404,
-                        'status' => false,
-                        'message' => $validator->errors(),
-                    ], 404);
+                if(!empty($request->keyword)){
+                    $get_users = User::select("*", DB::raw("'vendor' as type"))->where('type','butcher')->where('name','like','%'.$request->keyword.'%')->get();
+                    $get_products = Product::select("*", DB::raw("'product' as type"))->where('name','like','%'.$request->keyword.'%')->get();
+                }else{
+                    $get_users = User::select("*", DB::raw("'vendor' as type"))->where('type','butcher')->get();
+                    $get_products = Product::select("*", DB::raw("'product' as type"))->get();
+                   
                 }
                 
-                $get_users = User::select("*", DB::raw("'vendor' as type"))->where('name','like','%'.$request->keyword.'%')->get();
-                $get_products = Product::select("*", DB::raw("'product' as type"))->where('name','like','%'.$request->keyword.'%')->get();
-              
-                $users = collect($get_users);
-                $products = collect($get_products);
-                $data = $users->merge($products);
+                if(!empty($request->keyword)){
+                    $users = collect($get_users);
+                    $products = collect($get_products);
+                    $data = $users->merge($products);
+                }
+                
+                $data = collect($get_products);
                 
                 if($data){
                     return response()->json([

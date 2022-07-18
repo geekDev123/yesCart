@@ -53,6 +53,6 @@ class Product extends Model
 	}
 
 	public function getImageAttribute(){
-		return env('APP_URL').'/public'.$this->attributes['image'];
+		return env('APP_URL').''.$this->attributes['image'];
 	}
 }

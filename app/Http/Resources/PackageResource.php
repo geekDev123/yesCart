@@ -20,10 +20,10 @@ class PackageResource extends JsonResource
             'products' => $this->package_infos,
             'delivery_type' => $this->delivery_type,
             'delivery_day' => $this->delivery_day,
-            'agent_id' => getUserMetaInfoById($this->agent_id),
-            'agent_name' => $this->agent_id,
+            'agent' => getUserMetaInfoById($this->agent_id),
             'status' => $this->status,
-            'amount' => $this->amount
+            'amount' => $this->amount,
+            'image' => $this->image
         ];
     }
 }

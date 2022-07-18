@@ -42,6 +42,8 @@ class PackageController extends Controller
                     ], 404);
                 }
                
+                $get_product_image = Product::find($request->product_ids[0]);
+              
                 $package = new Package();
                 $package->name = $request->name;
                 $package->delivery_type = $request->delivery_type;
@@ -49,6 +51,7 @@ class PackageController extends Controller
                 $package->agent_id = $agent->id;
                 $package->status = '0';
                 $package->amount = $request->amount;
+                $package->image = $get_product_image->image;
                 $package->save();
                 
                 if(intval($package->id)){

@@ -30,7 +30,7 @@ class PackageController extends Controller
                     'product_ids' => 'required',
                     'products_quantity' => 'required',
                     'delivery_type' => 'required|string',
-                    'delivery_day' => 'required|string',
+                    //'delivery_day' => 'required|string',
                     'agent_id' => 'required',
                     'amount' => 'required|string'
                 ]);

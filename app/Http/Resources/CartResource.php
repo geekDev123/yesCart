@@ -22,7 +22,7 @@ class CartResource extends JsonResource
             'butcher_name' => getUserMetaInfoById($this->butcher_id),
             'quantity' => $this->quantity,
             'price' => $this->price,
-            'product_image' => env('APP_URL').getProductById($this->product_id)->image
+            'product_image' => getProductById($this->product_id)->image
         ];
     }
 }

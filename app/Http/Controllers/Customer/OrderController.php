@@ -60,7 +60,7 @@ class OrderController extends Controller
                             $product->update();
                         }
                         $butcher_id = Product::where('id',$request->product_id)->first();
-                        $get_merchant_id = user::where('id',$butcher_id->butcher_id)->first();
+                        $get_merchant_id = User::where('id',$butcher_id->butcher_id)->first();
                       
                         return $this->create_payment($user,$order->amount,$request,$order->id,$get_merchant_id['merchant_id']);
                     }

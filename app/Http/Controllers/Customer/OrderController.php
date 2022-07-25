@@ -106,10 +106,10 @@ class OrderController extends Controller
                     ], 200);   
                 }else{
                     return response()->json([
-                        'code' => 404,
+                        'code' => 200,
                         'status' => false,
                         'message' => 'Orders not found'
-                        ],404);
+                        ],200);
                 }
                 return response()->json([
                     'code' => 404,

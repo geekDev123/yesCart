@@ -107,8 +107,9 @@ class OrderController extends Controller
                 }else{
                     return response()->json([
                         'code' => 200,
-                        'status' => false,
-                        'message' => 'Orders not found'
+                        'status' => true,
+                        'message' => 'Orders not found',
+                        'data' => $orders
                         ],200);
                 }
                 return response()->json([

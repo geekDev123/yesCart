@@ -18,7 +18,7 @@ class OrderController extends Controller
     {   
         try { 
             if (!$user = auth()->user()) {
-                return response()->json(['code' => 404, 'status' => false, 'message' => 'Unathorised']);
+                return response()->json(['code' => 404, 'status' => false, 'message' => 'Unathorised'],200);
             } else {
                 if($request->status){
                     $orders = OrderResource::collection(Order::latest()
@@ -39,13 +39,13 @@ class OrderController extends Controller
                         'code' => 404,
                         'status' => false,
                         'message' => 'Orders not found'
-                        ],404);
+                        ],200);
                 }
                 return response()->json([
                     'code' => 404,
                     'status' => false,
                     'message' => 'Some error has been ocurred.'
-                    ],404);
+                    ],200);
             }
         } catch (JWTException $e) {
             return response()->json([

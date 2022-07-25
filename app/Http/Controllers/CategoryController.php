@@ -23,7 +23,7 @@ class CategoryController extends Controller
                 'code' => 404,
                 'status' => false,
                 'message' => 'Some error has been ocurred.'
-                ],404);
+                ],200);
         }
          
     }

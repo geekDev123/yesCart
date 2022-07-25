@@ -20,7 +20,7 @@ class OrderController extends Controller
     {
         try { 
             if (!$user = auth()->user()) {
-                return response()->json(['code' => 404, 'status' => false, 'message' => 'Unathorised']);
+                return response()->json(['code' => 404, 'status' => false, 'message' => 'Unathorised'],200);
             } else {
                 $customer = Auth::user();
                 $validator = Validator::make($request->all(), [
@@ -33,7 +33,7 @@ class OrderController extends Controller
                         'code' => 404,
                         'status' => false,
                         'message' => $validator->errors(),
-                    ], 404);
+                    ], 200);
                 }
 
                 $product = Product::where('id',$request->product_id)->first();
@@ -69,7 +69,7 @@ class OrderController extends Controller
                     'code' => 404,
                     'status' => false,
                     'message' => 'Some error has been ocurred.'
-                ], 404);
+                ], 200);
             }
         }catch (JWTException $e) {
             return response()->json([
@@ -84,7 +84,7 @@ class OrderController extends Controller
     {
         try { 
             if (!$user = auth()->user()) {
-                return response()->json(['code' => 404, 'status' => false, 'message' => 'Unathorised']);
+                return response()->json(['code' => 404, 'status' => false, 'message' => 'Unathorised'],200);
             } else {
                 $user = Auth::user();
                 if($request->status){
@@ -116,7 +116,7 @@ class OrderController extends Controller
                     'code' => 404,
                     'status' => false,
                     'message' => 'Some error has been ocurred.'
-                    ],404);
+                    ],200);
                 }
             }catch (JWTException $e) {
                 return response()->json([
@@ -228,7 +228,7 @@ class OrderController extends Controller
                             'code' => 404,
                             'status' => false,
                             'message' => 'Some error has been ocurred.'
-                        ], 404);
+                        ], 200);
                           
                     }else{
                         $order = Order::where('customer_id',$user->id)->where('id',$order_id)->first();
@@ -278,7 +278,7 @@ class OrderController extends Controller
                         'code' => 404,
                         'status' => false,
                         'message' => 'Customer has not been created.'
-                    ], 404);
+                    ], 200);
                 }
                   
 
@@ -287,7 +287,7 @@ class OrderController extends Controller
                       'code' => 404,
                       'status' => false,
                       'message' => 'Stripe token has been not generated.'
-                  ], 404);
+                  ], 200);
             }
         } catch (\Exception $e) {
             $message = $e->getMessage();

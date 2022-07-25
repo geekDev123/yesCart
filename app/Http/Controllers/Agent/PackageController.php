@@ -22,7 +22,7 @@ class PackageController extends Controller
     {   
         try { 
             if (!$user = auth()->user()) {
-                return response()->json(['code' => 404, 'status' => false, 'message' => 'Unathorised']);
+                return response()->json(['code' => 404, 'status' => false, 'message' => 'Unathorised'],200);
             } else {
                 $agent = Auth::user();
                 $validator = Validator::make($request->all(), [
@@ -39,7 +39,7 @@ class PackageController extends Controller
                         'code' => 404,
                         'status' => false,
                         'message' => $validator->errors(),
-                    ], 404);
+                    ], 200);
                 }
                
                 $get_product_image = Product::find($request->product_ids[0]);
@@ -104,7 +104,7 @@ class PackageController extends Controller
     public function list(Request $request){
         try { 
             if (!$user = auth()->user()) {
-                return response()->json(['code' => 404, 'status' => false, 'message' => 'Unathorised']);
+                return response()->json(['code' => 404, 'status' => false, 'message' => 'Unathorised'],200);
             } else {
                 $agent = Auth::user();
                 if($request->status){
@@ -129,13 +129,13 @@ class PackageController extends Controller
                         'code' => 404,
                         'status' => false,
                         'message' => 'Packages not found'
-                        ],404);
+                        ],200);
                 }
                 return response()->json([
                     'code' => 404,
                     'status' => false,
                     'message' => 'Some error has been ocurred.'
-                    ],404);
+                    ],200);
             }
         } catch (JWTException $e) {
             return response()->json([
@@ -154,7 +154,7 @@ class PackageController extends Controller
     {
         try { 
             if (!$user = auth()->user()) {
-                return response()->json(['code' => 404, 'status' => false, 'message' => 'Unathorised']);
+                return response()->json(['code' => 404, 'status' => false, 'message' => 'Unathorised'],200);
             } else {
                 $agent = Auth::user();
                 $validator = Validator::make($request->all(), [
@@ -167,7 +167,7 @@ class PackageController extends Controller
                         'code' => 404,
                         'status' => false,
                         'message' => $validator->errors(),
-                    ], 404);
+                    ], 200);
                 }
             
                 $package = PackageInfo::where('package_id',$request->package_id)->where('product_id',$request->product_id)->first();
@@ -204,7 +204,7 @@ class PackageController extends Controller
                     'code' => 404,
                     'status' => false,
                     'message' => 'Package not found'
-                ], 404);
+                ], 200);
             }
         }catch (JWTException $e) {
             return response()->json([
@@ -223,7 +223,7 @@ class PackageController extends Controller
     {
         try { 
             if (!$user = auth()->user()) {
-                return response()->json(['code' => 404, 'status' => false, 'message' => 'Unathorised']);
+                return response()->json(['code' => 404, 'status' => false, 'message' => 'Unathorised'],200);
             } else {
                 $package = Package::find($request->id);
                 $package->delete();
@@ -238,7 +238,7 @@ class PackageController extends Controller
                     'code' => 404,
                     'status' => false,
                     'message' => 'Some error has been ocurred.'
-                ], 404);
+                ], 200);
             }
         }catch (JWTException $e) {
             return response()->json([

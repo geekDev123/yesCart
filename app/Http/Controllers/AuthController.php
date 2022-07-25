@@ -33,7 +33,7 @@ class AuthController extends Controller
                 'code' => 404,
                 'status' => false,
                 'message' => $validator->errors()->first(),
-            ], 404);
+            ], 200);
         }
         if($request->type == 'butcher'){
 
@@ -49,7 +49,7 @@ class AuthController extends Controller
                     'code' => 404,
                     'status' => false,
                     'message' => $validator->errors(),
-                ], 404);
+                ], 200);
             }
             if($request->hasFile('image')){
                 $getImage = $request->image;
@@ -107,7 +107,7 @@ class AuthController extends Controller
             'code' => 404,
             'status' => false,
             'message' => 'Some error has been ocurred.'
-        ], 404);
+        ], 200);
        
     }
 
@@ -127,7 +127,7 @@ class AuthController extends Controller
                 'code' => 404,
                 'status' => false,
                 'message' => $validator->errors()->first()
-            ], 404);
+            ], 200);
         }
 
         $jwt_token = null;
@@ -138,7 +138,7 @@ class AuthController extends Controller
                 'code' => 404,
                 'status' => false,
                 'message' => 'Invalid email or password.'
-            ], 401);
+            ], 200);
         }
        
         $user = Auth::User();

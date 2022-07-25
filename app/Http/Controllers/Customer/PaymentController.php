@@ -13,7 +13,7 @@ class PaymentController extends Controller
     {
         try {
             if (!$user = auth()->user()) {
-                return response()->json(['code' => 404, 'status' => false, 'message' => 'Unathorised']);
+                return response()->json(['code' => 404, 'status' => false, 'message' => 'Unathorised'],200);
             } else {
                
                 //$stripe = Stripe::make(env('STRIPE_SECRET'));
@@ -103,14 +103,14 @@ class PaymentController extends Controller
                                 'code' => 404,
                                 'status' => false,
                                 'message' => 'Some error has been ocurred.'
-                            ], 404);
+                            ], 200);
                             
                         }else{
                             return response()->json([
                                 'code' => 404,
                                 'status' => false,
                                 'message' => 'Customer has not been created.'
-                            ], 404);
+                            ], 200);
                         }
                         
                     }else{
@@ -133,7 +133,7 @@ class PaymentController extends Controller
                             'code' => 404,
                             'status' => false,
                             'message' => 'Some error has been ocurred.'
-                        ], 404);
+                        ], 200);
                     }
                     
                     
@@ -143,7 +143,7 @@ class PaymentController extends Controller
                         'code' => 404,
                         'status' => false,
                         'message' => 'Stripe token has been not generated.'
-                    ], 404);
+                    ], 200);
                 }
             }
         } catch (\Exception $e) {
@@ -160,7 +160,7 @@ class PaymentController extends Controller
     {
         try {
             if (!$user = auth()->user()) {
-                return response()->json(['code' => 404, 'status' => false, 'message' => 'Unathorised']);
+                return response()->json(['code' => 404, 'status' => false, 'message' => 'Unathorised'],200);
             } else {
                 Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
 
@@ -196,7 +196,7 @@ class PaymentController extends Controller
                     'code' => 404,
                     'status' => false,
                     'message' => "Some error has been occured"
-                ], 404);
+                ], 200);
             }
         } catch (\Exception $e) {
             $message = $e->getMessage();

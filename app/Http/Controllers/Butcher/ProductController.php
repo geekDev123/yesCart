@@ -17,7 +17,7 @@ class ProductController extends Controller
     {   
         try { 
             if (!$user = auth()->user()) {
-                return response()->json(['code' => 404, 'status' => false, 'message' => 'Unathorised']);
+                return response()->json(['code' => 404, 'status' => false, 'message' => 'Unathorised'],200);
             } else {
                 $butcher = Auth::user();
                 $validator = Validator::make($request->all(), [
@@ -34,7 +34,7 @@ class ProductController extends Controller
                         'code' => 404,
                         'status' => false,
                         'message' => $validator->errors(),
-                    ], 404);
+                    ], 200);
                 }
 
                 if($request->hasFile('image')) 
@@ -49,7 +49,7 @@ class ProductController extends Controller
                         'code' => 404,
                         'status' => false,
                         'message' => $validator->errors(),
-                    ], 404);
+                    ], 200);
                 }
                 
                 $product = new Product();

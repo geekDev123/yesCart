@@ -17,7 +17,7 @@ class CartController extends Controller
     {
         try { 
             if (!$user = auth()->user()) {
-                return response()->json(['code' => 404, 'status' => false, 'message' => 'Unathorised']);
+                return response()->json(['code' => 404, 'status' => false, 'message' => 'Unathorised'],200);
             } else {
                 $customer = Auth::user();
                 $validator = Validator::make($request->all(), [
@@ -31,7 +31,7 @@ class CartController extends Controller
                         'code' => 404,
                         'status' => false,
                         'message' => $validator->errors()->first(),
-                    ], 404);
+                    ], 200);
                 }
             
                 $get_product = Product::where('id',$request->product_id)->first();
@@ -42,7 +42,7 @@ class CartController extends Controller
                         'code' => 404,
                         'status' => false,
                         'message' => 'Product is out of stock.'
-                    ], 404);
+                    ], 200);
                 }else{
                     if(!$get_cart){
                         /* Save Cart */
@@ -68,13 +68,13 @@ class CartController extends Controller
                             'code' => 404,
                             'status' => false,
                             'message' => 'Not allowed to add item more than one butcher.'
-                        ], 404);
+                        ], 200);
                     }
                         return response()->json([
                             'code' => 404,
                             'status' => false,
                             'message' => 'Product is already in cart.'
-                        ], 404);
+                        ], 200);
                      }
                 }
                
@@ -83,7 +83,7 @@ class CartController extends Controller
                     'code' => 404,
                     'status' => false,
                     'message' => 'Some error has been ocurred.'
-                ], 404);
+                ], 200);
             }
         }catch (JWTException $e) {
             return response()->json([
@@ -98,7 +98,7 @@ class CartController extends Controller
     {
         try { 
             if (!$user = auth()->user()) {
-                return response()->json(['code' => 404, 'status' => false, 'message' => 'Unathorised']);
+                return response()->json(['code' => 404, 'status' => false, 'message' => 'Unathorised'],200);
             } else {
                 $user = Auth::user();
                 $cart = CartResource::collection(Cart::latest()
@@ -116,13 +116,13 @@ class CartController extends Controller
                         'code' => 404,
                         'status' => false,
                         'message' => 'Cart is empty'
-                        ],404);
+                        ],200);
                 }
                 return response()->json([
                     'code' => 404,
                     'status' => false,
                     'message' => 'Some error has been ocurred.'
-                    ],404);
+                    ],200);
                 }
             }catch (JWTException $e) {
                 return response()->json([
@@ -137,7 +137,7 @@ class CartController extends Controller
     {
         try { 
             if (!$user = auth()->user()) {
-                return response()->json(['code' => 404, 'status' => false, 'message' => 'Unathorised']);
+                return response()->json(['code' => 404, 'status' => false, 'message' => 'Unathorised'],200);
             } else {
                 $customer = Auth::user();
                 $validator = Validator::make($request->all(), [
@@ -149,7 +149,7 @@ class CartController extends Controller
                         'code' => 404,
                         'status' => false,
                         'message' => $validator->errors(),
-                    ], 404);
+                    ], 200);
                 }
                
                 $cart = Cart::where('product_id',$request->product_id)->where('customer_id',$customer->id)->first();
@@ -159,16 +159,6 @@ class CartController extends Controller
                     $cart->price = $request->price;
                     $cart->save();
                     if(intval($cart->id)){
-                        /*     
-                        $new_quantity = $product->quantity - $request->quantity;
-                        if($new_quantity > 0){
-                            $product->quantity = $new_quantity;
-                            $product->status = 'instock';
-                            $product->update();
-                        }else{
-                            $product->status = 'outofstock';
-                            $product->update();
-                        } */
                         return response()->json([
                             'code' => 200,
                             'status' => true,
@@ -182,7 +172,7 @@ class CartController extends Controller
                         'code' => 404,
                         'status' =>  false,
                         'message' => 'Some error has been ocurred.'
-                    ],404);
+                    ],200);
                 }
                 
             }
@@ -200,7 +190,7 @@ class CartController extends Controller
     {
         try { 
             if (!$user = auth()->user()) {
-                return response()->json(['code' => 404, 'status' => false, 'message' => 'Unathorised']);
+                return response()->json(['code' => 404, 'status' => false, 'message' => 'Unathorised'],200);
             } else {
                 $cart = Cart::find($request->id);
                 $cart->delete();
@@ -216,7 +206,7 @@ class CartController extends Controller
                     'code' => 404,
                     'status' => false,
                     'message' => 'Some error has been ocurred.'
-                ], 404);
+                ], 200);
             }
         }catch (JWTException $e) {
             return response()->json([

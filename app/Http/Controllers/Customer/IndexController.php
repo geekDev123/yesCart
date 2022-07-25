@@ -20,7 +20,7 @@ class IndexController extends Controller
     {     
         try { 
             if (!$user = auth()->user()) {
-                return response()->json(['code' => 404, 'status' => false, 'message' => 'Unathorised']);
+                return response()->json(['code' => 404, 'status' => false, 'message' => 'Unathorised'],200);
             } else {
                 $user = Auth::User();
             
@@ -71,7 +71,7 @@ class IndexController extends Controller
                         'code' => 404,
                         'status' => false,
                         'message' => 'Butchers not found',
-                    ], 404);
+                    ], 200);
                 }
             }
         }catch (JWTException $e) {
@@ -92,7 +92,7 @@ class IndexController extends Controller
     {     
         try { 
             if (!$user = auth()->user()) {
-                return response()->json(['code' => 404, 'status' => false, 'message' => 'Unathorised']);
+                return response()->json(['code' => 404, 'status' => false, 'message' => 'Unathorised'],200);
             } else {
                 $user = Auth::User();
                 $lat = $user['lat'];
@@ -144,7 +144,7 @@ class IndexController extends Controller
                         'code' => 404,
                         'status' => false,
                         'message' => 'Results not found',
-                    ], 404);
+                    ], 200);
                 }
             }
         }catch (JWTException $e) {
@@ -162,7 +162,7 @@ class IndexController extends Controller
        
         try { 
             if (!$user = auth()->user()) {
-                return response()->json(['code' => 404, 'status' => false, 'message' => 'Unathorised']);
+                return response()->json(['code' => 404, 'status' => false, 'message' => 'Unathorised'],200);
             } else { 
                 $user = Auth::User();
             
@@ -195,7 +195,7 @@ class IndexController extends Controller
                         'code' => 404,
                         'status' => false,
                         'message' => 'Results not found',
-                    ], 404);
+                    ], 200);
                 }
             }
         }catch (JWTException $e) {

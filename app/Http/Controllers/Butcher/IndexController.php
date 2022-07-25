@@ -16,7 +16,7 @@ class IndexController extends Controller
     {           
         try { 
             if (!$user = auth()->user()) {
-                return response()->json(['code' => 404, 'status' => false, 'message' => 'Unathorised']);
+                return response()->json(['code' => 404, 'status' => false, 'message' => 'Unathorised'],200);
             } else {
                 $butcher = Auth::user();
                 if($request->status){
@@ -36,13 +36,13 @@ class IndexController extends Controller
                         'code' => 404,
                         'status' => false,
                         'message' => 'Product not found'
-                        ],404);
+                        ],200);
                 }
                 return response()->json([
                     'code' => 404,
                     'status' => false,
                     'message' => 'Some error has been ocurred.'
-                    ],404);
+                    ],200);
             }
         }catch (JWTException $e) {
             return response()->json([
